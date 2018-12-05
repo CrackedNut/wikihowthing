@@ -5,6 +5,8 @@ import webbrowser
 from PIL import Image, ImageTk
 import os
 from imgdownloader import DownloadImages
+from shutil import copyfile
+
 
 
 class Window:
@@ -12,6 +14,7 @@ class Window:
 
         self.igc = DownloadImages()
         self.imgs = []
+        self.imgindex = 0
 
         print("Welcome to the WikiHow random article browser!")
 
@@ -27,6 +30,18 @@ class Window:
         self.next = Button(self.frame, text="NEXT",
                            fg="green", command=self.RandomArticle)
         self.next.pack(side=LEFT)
+
+        self.prevpic = Button(self.frame, text = "PREVIOUS PIC",
+                              fg="black", command=self.previmg)
+        self.prevpic.pack(side=LEFT)
+
+        self.nextpic = Button(self.frame, text = "NEXT PIC",
+                              fg="black", command=self.nextimg)
+        self.nextpic.pack(side=LEFT)
+
+        self.savebtn = Button(self.frame, text = "SAVE PIC",
+                              fg="black", command=self.savepic)
+        self.savebtn.pack(side=LEFT)
 
         self.hi_there = Button(self.frame, text="OPEN",
                                command=self.openArticle)
@@ -46,18 +61,36 @@ class Window:
     def openArticle(self):
         webbrowser.open_new_tab(self.url)
 
-    def setImage(self, s):
-        self.imgs = self.igc.getImages(s)
-        photo = Image.open(self.imgs[0]).resize((300, 250), Image.ANTIALIAS)
+    def switchpic(self, pic):
+        photo = Image.open(self.imgs[pic]).resize((300, 250), Image.ANTIALIAS)
         self.labelimage = ImageTk.PhotoImage(photo)
         self.photolabel.configure(image=self.labelimage)
         self.photolabel.image = self.labelimage
+
+    def previmg(self):
+        if self.imgindex > 0:
+            self.imgindex -= 1
+            self.switchpic(self.imgindex)
+
+    def nextimg(self):
+        if self.imgindex < len(self.imgs)-1 :
+            self.imgindex += 1
+            self.switchpic(self.imgindex)
+
+    def savepic(self):
+        copyfile(self.imgs[self.imgindex], f"./SAVED_IMAGES/{self.aTitle}-{self.imgindex}.jpg")
+
+    def setImage(self, s):
+        self.imgs = self.igc.getImages(s)
+        self.imgindex = 0
+        self.switchpic(0)
 
     def RandomArticle(self):
         response = requests.get("https://www.wikihow.com/Special:Randomizer")
         self.url = response.url
         soup = BeautifulSoup(response.content, "html.parser")
-        self.label1text.set(soup.find_all("h1")[0].a.text)
+        self.aTitle = soup.find_all("h1")[0].a.text
+        self.label1text.set(self.aTitle)
         self.igc.deleteImages(self.imgs)
         self.setImage(soup)
 
