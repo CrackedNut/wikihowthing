@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 import os
 from imgdownloader import DownloadImages
 
+
 class Window:
     def __init__(self, master):
 
@@ -15,9 +16,9 @@ class Window:
         print("Welcome to the WikiHow random article browser!")
 
         self.labelimage = None
-        self.labeltext = StringVar()
+        self.label1text = StringVar()
 
-        self.articleName = Label(master, textvariable=self.labeltext)
+        self.articleName = Label(master, textvariable=self.label1text)
         self.articleName.pack()
 
         self.frame = Frame(master)
@@ -56,16 +57,21 @@ class Window:
         response = requests.get("https://www.wikihow.com/Special:Randomizer")
         self.url = response.url
         soup = BeautifulSoup(response.content, "html.parser")
-        self.labeltext.set(soup.find_all("h1")[0].a.text)
+        self.label1text.set(soup.find_all("h1")[0].a.text)
         self.igc.deleteImages(self.imgs)
         self.setImage(soup)
 
 
-root = Tk()
-root.title("Random WikiHow article")
-root.geometry("500x300+100+100")
+def main():
+    root = Tk()
+    root.title("Random WikiHow article")
+    root.geometry("500x300+100+100")
 
-window = Window(root)
+    window = Window(root)
 
-root.mainloop()
-root.destroy()
+    root.mainloop()
+    root.destroy()
+
+
+if __name__ == '__main__':
+    main()
