@@ -2,6 +2,7 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
+
 class DownloadImages():
     """Documentation for DownloadImages
     """
@@ -42,4 +43,4 @@ class DownloadImages():
 
     def getPaths(self):
         return self.imgsPaths
-    #def nenPage(self):
+    # def nenPage(self):

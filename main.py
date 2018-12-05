@@ -8,7 +8,6 @@ from imgdownloader import DownloadImages
 from shutil import copyfile
 
 
-
 class Window:
     def __init__(self, master):
 
@@ -31,15 +30,15 @@ class Window:
                            fg="green", command=self.RandomArticle)
         self.next.pack(side=LEFT)
 
-        self.prevpic = Button(self.frame, text = "PREVIOUS PIC",
+        self.prevpic = Button(self.frame, text="PREVIOUS PIC",
                               fg="black", command=self.previmg)
         self.prevpic.pack(side=LEFT)
 
-        self.nextpic = Button(self.frame, text = "NEXT PIC",
+        self.nextpic = Button(self.frame, text="NEXT PIC",
                               fg="black", command=self.nextimg)
         self.nextpic.pack(side=LEFT)
 
-        self.savebtn = Button(self.frame, text = "SAVE PIC",
+        self.savebtn = Button(self.frame, text="SAVE PIC",
                               fg="black", command=self.savepic)
         self.savebtn.pack(side=LEFT)
 
@@ -73,12 +72,13 @@ class Window:
             self.switchpic(self.imgindex)
 
     def nextimg(self):
-        if self.imgindex < len(self.imgs)-1 :
+        if self.imgindex < len(self.imgs) - 1:
             self.imgindex += 1
             self.switchpic(self.imgindex)
 
     def savepic(self):
-        copyfile(self.imgs[self.imgindex], f"./SAVED_IMAGES/{self.aTitle}-{self.imgindex}.jpg")
+        copyfile(self.imgs[self.imgindex],
+                 f"./SAVED_IMAGES/{self.aTitle}-{self.imgindex}.jpg")
 
     def setImage(self, s):
         self.imgs = self.igc.getImages(s)
