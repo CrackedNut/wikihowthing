@@ -5,8 +5,6 @@ from bs4 import BeautifulSoup
 class DownloadImages():
     """Documentation for DownloadImages
     """
-    def __init__(self, page):
-        pass
 
     def getImages(self, s):
         found = s.find_all("img", {"class": "whcdn content-fill"})

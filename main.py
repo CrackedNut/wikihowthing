@@ -4,12 +4,13 @@ from bs4 import BeautifulSoup
 import webbrowser
 from PIL import Image, ImageTk
 import os
-from .imgdownloader import DownloadImages
+from imgdownloader import DownloadImages
 
 class Window:
     def __init__(self, master):
 
         self.igc = DownloadImages()
+        self.imgs = []
 
         print("Welcome to the WikiHow random article browser!")
 
@@ -38,30 +39,26 @@ class Window:
         self.photolabel.pack()
 
     def Quitting(self):
-        self.igc(self.igc.getPaths())
+        self.igc.deleteImages(self.imgs)
         self.frame.quit()
 
     def openArticle(self):
         webbrowser.open_new_tab(self.url)
 
-    def getImage(self, s):
-
-        imgs = self.igc.getImages(s)
-        photo = Image.open(imgs[1])
-        photo = photo.resize((300, 250), Image.ANTIALIAS)
+    def setImage(self, s):
+        self.imgs = self.igc.getImages(s)
+        photo = Image.open(self.imgs[0]).resize((300, 250), Image.ANTIALIAS)
         self.labelimage = ImageTk.PhotoImage(photo)
         self.photolabel.configure(image=self.labelimage)
         self.photolabel.image = self.labelimage
 
-
-
     def RandomArticle(self):
         response = requests.get("https://www.wikihow.com/Special:Randomizer")
-        pageurl = response.url
+        self.url = response.url
         soup = BeautifulSoup(response.content, "html.parser")
-        self.url = soup.find_all("h1")[0].a["href"][2:]
         self.labeltext.set(soup.find_all("h1")[0].a.text)
-        self.getImage(soup)
+        self.igc.deleteImages(self.imgs)
+        self.setImage(soup)
 
 
 root = Tk()
