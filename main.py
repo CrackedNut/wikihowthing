@@ -1,9 +1,10 @@
+from ast import Pass
 from tkinter import *
 import requests
 from bs4 import BeautifulSoup
 import webbrowser
 from PIL import Image, ImageTk
-import os
+from os import path, mkdir
 from imgdownloader import DownloadImages
 from shutil import copyfile
 
@@ -19,6 +20,8 @@ class Window:
 
         self.labelimage = None
         self.label1text = StringVar()
+        self.label2text = StringVar()
+        self.label2text.set("0/0")
 
         self.articleName = Label(master, textvariable=self.label1text)
         self.articleName.pack()
@@ -52,8 +55,15 @@ class Window:
 
         self.photolabel = Label(master, image=self.labelimage)
         self.photolabel.pack()
+        
+        self.counter = Label(master, textvariable=self.label2text)
+        self.counter.pack(side=BOTTOM)
 
     def Quitting(self):
+        self.igc.deleteImages(self.imgs)
+        self.frame.quit()
+        
+    def on_close(self):
         self.igc.deleteImages(self.imgs)
         self.frame.quit()
 
@@ -61,7 +71,7 @@ class Window:
         webbrowser.open_new_tab(self.url)
 
     def switchpic(self, pic):
-        photo = Image.open(self.imgs[pic]).resize((300, 250), Image.ANTIALIAS)
+        photo = Image.open(self.imgs[pic]).resize((300, 250))
         self.labelimage = ImageTk.PhotoImage(photo)
         self.photolabel.configure(image=self.labelimage)
         self.photolabel.image = self.labelimage
@@ -70,11 +80,14 @@ class Window:
         if self.imgindex > 0:
             self.imgindex -= 1
             self.switchpic(self.imgindex)
+            self.label2text.set(f"{self.imgindex+1}/{len(self.imgs)}")
+
 
     def nextimg(self):
         if self.imgindex < len(self.imgs) - 1:
             self.imgindex += 1
             self.switchpic(self.imgindex)
+            self.label2text.set(f"{self.imgindex+1}/{len(self.imgs)}")
 
     def savepic(self):
         copyfile(self.imgs[self.imgindex],
@@ -93,18 +106,25 @@ class Window:
         self.label1text.set(self.aTitle)
         self.igc.deleteImages(self.imgs)
         self.setImage(soup)
+        self.label2text.set(f"{self.imgindex+1}/{len(self.imgs)}")
 
 
 def main():
+    #Check if folders exist
+    if not path.exists('./SAVED_IMAGES'):
+        mkdir('./SAVED_IMAGES')
+    if not path.exists('./IMAGES'):
+        mkdir('./IMAGES')
+    
     root = Tk()
     root.title("Random WikiHow article")
-    root.geometry("500x300+100+100")
+    root.geometry("500x325+100+100")
 
     window = Window(root)
 
+    root.protocol("WM_DELETE_WINDOW", window.on_close)
     root.mainloop()
     root.destroy()
-
 
 if __name__ == '__main__':
     main()
